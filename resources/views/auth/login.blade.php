@@ -9,7 +9,13 @@
     <div class="container">
         <div class="card">
             <h3>Login Form</h3>
-            <form action="{{ route('login') }}" method="post">
+             @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
+            @endif
+            <form action="{{ route('login') }}" method="POST">
+                @csrf
                 <div>
                     <label for="email">Email : </label>
                     <input type="email" name="email" placeholder="Enter Email">
@@ -19,7 +25,7 @@
                     <input type="password" name="password" placeholder="Enter Password">
                 </div>
                 <button type="submit">Login</button>
-                <p>Don't Have Account ? </p> <a href="{{route('register.form')}}">Register Here</a>
+                <p>Don't Have Account ? </p> <a href="{{ route('register.form') }}">Register Here</a>
             </form>
         </div>
     </div>
