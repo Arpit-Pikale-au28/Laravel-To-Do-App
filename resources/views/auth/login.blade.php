@@ -9,11 +9,6 @@
     <div class="container">
         <div class="card">
             <h3>Login Form</h3>
-             @if ($errors->any())
-                @foreach ($errors->all() as $error)
-                    <p>{{ $error }}</p>
-                @endforeach
-            @endif
             <form action="{{ route('login') }}" method="POST">
                 @csrf
                 <div>

@@ -26,11 +26,12 @@ class UserController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('login')->withErrors(['msg' => 'You Have Been Logout.']);
+        toastr()->success('You Have Been Logout.');
+        return redirect('login');
     }
 
     public function login(Request $request)
-    {
+    {   
         $validator = Validator::make($request->all(),
             [
                 'email'     => 'required|email',
@@ -39,7 +40,10 @@ class UserController extends Controller
         );
 
         if ($validator->fails()) {
-            return redirect('login')->withErrors($validator);
+            foreach($validator->errors()->all() as $errors) {
+                toastr()->error($errors);
+            }
+            return redirect()->back();
         }
 
         $userData = [
@@ -48,11 +52,13 @@ class UserController extends Controller
         ];
 
         if (!Auth::attempt($userData)) {
-            return redirect('login')->withErrors(['isValid' => 'Invalid Credentils try again !!']);
+            toastr()->error('Invalid Credentils try again !!');
+            return redirect()->back();
         }
 
         $request->session()->regenerate();
-        // $request->session()->put('user', Auth::user());
+        $userName = Auth::user()->first_name;
+        toastr()->success("Welcome {$userName}");
         return redirect()->route('dashboard');
     }
 
@@ -94,13 +100,17 @@ class UserController extends Controller
         );
 
         if ($validator->fails()) {
-            return redirect('register')->withErrors($validator);
+            foreach($validator->errors()->all() as $errors) {
+                toastr()->error($errors);
+            }
+            return redirect()->back();
         }
 
         $user = User::where('email', $request->email)->first();
 
         if ($user) {
-            return redirect('register')->withErrors(['userExists' => 'User Alredy Exists !!']);
+            toastr()->error('User Alredy Exists !!');
+            return redirect()->back();
         }
 
         $user = User::create([
@@ -112,8 +122,8 @@ class UserController extends Controller
             'password'    => Hash::make($request->password),
         ]);
         $user->save();
-
-        return redirect('dashboard')->withErrors(['successMessage' => 'User Registered Successfully !!']);
+        toastr()->success('User Registered Successfully !!');
+        return redirect('login');
     }
 
     public function dashboardView()
